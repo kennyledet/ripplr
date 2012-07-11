@@ -81,6 +81,11 @@ while True:
 	if start == 0: # if running on first loop iteration
 		print json_output['posts-total'], 'photo posts found' # tell the user how many posts were found
 
+	if limit:
+		print 'Downloading', str(limit), 'images'
+	else:
+		print 'Downloading all images'
+
 	""" Download the images """
 	for post in json_output['posts']: # for every post in this iteration
 		if post['photo-url-1280']: # if image content exists
