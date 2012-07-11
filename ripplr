@@ -46,6 +46,9 @@ def download(img):
 """ Get some initial input from the user """
 blog_url  = raw_input('Enter tumblr url\n> ')
 tag_query = raw_input('Enter a specific tag to filter posts by, (just press enter for no tag filter)\n> ') 
+limit     = int(raw_input('Enter max # of images to download(just enter 0 to download all images)\n> '))
+
+
 
 if blog_url[-1] == '/': # if URL has a trailing slash, remove it
 	blog_url = blog_url[0:-1]
@@ -58,6 +61,7 @@ create_path(path)
 print 'Downloading from %s...' % (blog_url,)
 start = 0 # initialize the API reading start offset to 0
 threads = []
+download_count = 0
 """ Begin the download loop """
 while True:
 	""" Construct the full URL to retrieve JSON from """
@@ -83,13 +87,24 @@ while True:
 			t = threading.Thread(target=download, args=(post['photo-url-1280'],))
 			threads.append(t)
 			t.start()
+			download_count = download_count + 1
+			if limit: # if limit is defined
+				if download_count == limit + 1: # if limit reached
+					time.sleep(30)
+					exit(1) # break
 		if post['photos']: # if post has a photoset
 			for photo in post['photos']: # download each image in the photoset as well
 				t = threading.Thread(target=download, args=(photo['photo-url-1280'],))
 				threads.append(t)
 				t.start()
+				download_count = download_count + 1
+				if limit: # if limit is defined
+					if download_count == limit + 1: # if limit reached
+						time.sleep(30)
+						exit(1) # break
 	time.sleep(30) # sleep a little bit to give recent threads more time to finish
 	start = start + 50 # increment the start GET parameter by 50 for the next loop iteration
+
 
 	if start > int(json_output['posts-total']): # if no more posts to scrape
 		print 'Scraped ', json_output['posts-total'], 'photo posts'
