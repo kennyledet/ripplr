@@ -81,10 +81,17 @@ while True:
 
 	""" Download the images """
 	for post in json_output['posts']: # for every post in this iteration
-		thread.start_new_thread(download,(post['photo-url-1280'],)) # download the image content
+		if post['photo-url-1280']: # if image content exists
+			thread.start_new_thread(download,(post['photo-url-1280'],)) # download the image content
 		if post['photos']: # if post has a photoset
 			for photo in post['photos']: # download each image in the photoset as well
 				thread.start_new_thread(download,(photo['photo-url-1280'],))
 
 	time.sleep(30) # sleep a little bit to give recent threads more time to finish
 	start = start + 50 # increment the start GET parameter by 50 for the next loop iteration
+
+	if start > int(json_output['posts-total']): # if no more posts to scrape
+		print 'Scraped ', json_output['posts-total'], 'photo posts'
+		print 'Downloads are contained in ./downloads/'+title+'/'
+		break
+
