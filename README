@@ -1,0 +1,8 @@
+In order to use this scraper, you simply follow the following steps
+
+1. Run the python script
+2. Enter the full URL (eg. http://someblog.tumblr.com ) when prompted
+3. Optionally, at the next prompt, you may specify a tag by which to filter the images. If you would like to download all images, simply do not enter a tag and press enter to continue
+4. The scraper will do its thing, and your images will be saved in './downloads/someblog.tumblr.com/'
+
+NOTE: For now, there isn't really any error checking, as I hacked this together just last night, so at the end of the scrape (when all images are done downloading), you will probably get some ugly error message (because of the response from the server). It's ok, all of the images were still downloaded just fine. I'll implement the exception handling very soon, it's on my todo list :).
