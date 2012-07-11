@@ -1,3 +1,4 @@
+#!/usr/local/bin/python
 """
 ripplr.py
 Purpose: A tumblr blog image scraper
@@ -19,15 +20,12 @@ Copyright 2012 Kendrick Ledet
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import resource
-import thread
+import threading
 import time
 import urllib2
 import urllib
 import json
 import os
-
-resource.setrlimit(resource.RLIMIT_NOFILE, (9001,-1))
 
 def create_path(path):
 	if not os.path.isdir(path):
@@ -59,6 +57,7 @@ create_path(path)
 
 print 'Downloading from %s...' % (blog_url,)
 start = 0 # initialize the API reading start offset to 0
+threads = []
 """ Begin the download loop """
 while True:
 	""" Construct the full URL to retrieve JSON from """
@@ -81,11 +80,14 @@ while True:
 	""" Download the images """
 	for post in json_output['posts']: # for every post in this iteration
 		if post['photo-url-1280']: # if image content exists
-			thread.start_new_thread(download,(post['photo-url-1280'],)) # download the image content
+			t = threading.Thread(target=download, args=(post['photo-url-1280'],))
+			threads.append(t)
+			t.start()
 		if post['photos']: # if post has a photoset
 			for photo in post['photos']: # download each image in the photoset as well
-				thread.start_new_thread(download,(photo['photo-url-1280'],))
-
+				t = threading.Thread(target=download, args=(photo['photo-url-1280'],))
+				threads.append(t)
+				t.start()
 	time.sleep(30) # sleep a little bit to give recent threads more time to finish
 	start = start + 50 # increment the start GET parameter by 50 for the next loop iteration
 
@@ -93,4 +95,3 @@ while True:
 		print 'Scraped ', json_output['posts-total'], 'photo posts'
 		print 'Downloads are contained in ./downloads/'+title+'/'
 		break
-
