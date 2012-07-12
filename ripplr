@@ -46,7 +46,7 @@ def download(img):
 """ Get some initial input from the user """
 blog_url  = raw_input('Enter tumblr url\n> ')
 tag_query = raw_input('Enter a specific tag to filter posts by, (just press enter for no tag filter)\n> ') 
-limit     = int(raw_input('Enter max # of images to download(just enter 0 to download all images)\n> '))
+limit     = int(raw_input('Enter max # of images to download, (just enter 0 to download all images)\n> '))
 
 
 
