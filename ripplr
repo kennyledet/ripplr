@@ -20,7 +20,6 @@ Copyright 2012 Kendrick Ledet
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import threading
 import time
 import urllib2
 import urllib
@@ -46,8 +45,7 @@ def download(img):
 """ Get some initial input from the user """
 blog_url  = raw_input('Enter tumblr url\n> ')
 tag_query = raw_input('Enter a specific tag to filter posts by, (just press enter for no tag filter)\n> ') 
-limit     = int(raw_input('Enter max # of images to download(just enter 0 to download all images)\n> '))
-
+limit     = int(raw_input('Enter max # of images to download (just enter 0 to download all images)\n> '))
 
 
 if blog_url[-1] == '/': # if URL has a trailing slash, remove it
@@ -60,7 +58,6 @@ create_path(path)
 
 print 'Downloading from %s...' % (blog_url,)
 start = 0 # initialize the API reading start offset to 0
-threads = []
 download_count = 0
 """ Begin the download loop """
 while True:
@@ -81,35 +78,31 @@ while True:
 	if start == 0: # if running on first loop iteration
 		print json_output['posts-total'], 'photo posts found' # tell the user how many posts were found
 		if limit:
-			print 'Downloading', str(limit), 'images'
+			print 'Downloading a maximum of', str(limit), 'images'
 		else:
 			print 'Downloading all images'
 
 	""" Download the images """
 	for post in json_output['posts']: # for every post in this iteration
 		if post['photo-url-1280']: # if image content exists
-			t = threading.Thread(target=download, args=(post['photo-url-1280'],))
-			threads.append(t)
-			t.start()
+			download(post['photo-url-1280'])
 			download_count = download_count + 1
 			if limit: # if limit is defined
 				if download_count == limit + 1: # if limit reached
-					time.sleep(30)
-					exit(1) # break
+					break
 		if post['photos']: # if post has a photoset
 			for photo in post['photos']: # download each image in the photoset as well
-				t = threading.Thread(target=download, args=(photo['photo-url-1280'],))
-				threads.append(t)
-				t.start()
+				download(photo['photo-url-1280'])
 				download_count = download_count + 1
 				if limit: # if limit is defined
 					if download_count == limit + 1: # if limit reached
-						time.sleep(30)
-						exit(1) # break
-	time.sleep(30) # sleep a little bit to give recent threads more time to finish
+						break
+
+	if limit:
+		if download_count + limit == 1:
+			break
+
 	start = start + 50 # increment the start GET parameter by 50 for the next loop iteration
-
-
 	if start > int(json_output['posts-total']): # if no more posts to scrape
 		print 'Scraped ', json_output['posts-total'], 'photo posts'
 		print 'Downloads are contained in ./downloads/'+title+'/'
