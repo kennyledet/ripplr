@@ -82,7 +82,7 @@ while True:
 	if start == 0:  # if running on first loop iteration
 		print 'This tumblog has', json_output['posts-total'], 'photo posts in total'  # tell the user how many total posts tumblr has
 		if limit:
-			print 'But we\'re going to download a maximum of', str(limit), 'images'
+			print 'but we\'re going to download a maximum of', str(limit), 'images'
 		else:
 			print 'Downloading all images'
 
@@ -103,7 +103,7 @@ while True:
 					if download_count == limit:  # if limit reached
 						print 'Limit reached, images are in ./downloads/'+title+'/'
 						exit(1)
-	
+
 	start = start + 50  # increment the start GET parameter by 50 for the next loop iteration
 	if start > int(json_output['posts-total']):  # if no more posts to scrape
 		print 'Scraped ', json_output['posts-total'], 'photo posts'
