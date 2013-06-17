@@ -33,7 +33,8 @@ def clean_title(blog_url):
 """ Download a given img link """
 
 def download(img):
-	filename = img.split('/')[3]  # get the original filename from the image link
+	filename = img.split('/')[4]  # get the original filename from the image link
+	print filename
 	if os.path.exists(os.path.join(path, filename)):  # don't overwrite existing images
 		pass
 	else:
