@@ -33,12 +33,18 @@ def clean_title(blog_url):
 """ Download a given img link """
 
 def download(img):
-	filename = img.split('/')[4]  # get the original filename from the image link
-	print filename
-	if os.path.exists(os.path.join(path, filename)):  # don't overwrite existing images
-		pass
+	img_url_chunks = img.split('/')
+
+	filename = img_url_chunks[3] if len(img_url_chunks) < 5 else img_url_chunks[4]  # get the original filename from the image link
+	ext = filename.split('.')[-1]
+
+	full_filename = '{}.{}'.format(filename, ext))
+
+	if os.path.exists(os.path.join(path, full_filename)):  # don't overwrite existing images
+		print 'Already downloaded {} ...skipping'.format(full_filename)
 	else:
-		urllib.urlretrieve(img, os.path.join(path, filename))  # download the img 
+		print 'Downloading {}'.format(full_filename)
+		urllib.urlretrieve(img, os.path.join(path, '{}.{}'.format(full_filename, ext)))  # download the img 
 
 """ Get some initial input from the user """
 
@@ -88,20 +94,18 @@ while True:
 			print 'Downloading all images'
 
 	# Download images in the current JSON response range
-	for post in json_output['posts']:  # for every post in this iteration
+	for post in json_output['posts']:
 		if post['photo-url-1280']:  # if image content exists
 			download(post['photo-url-1280'])
 			download_count = download_count + 1
-			if limit:  # if limit is defined
-				if download_count == limit:  # if limit reached
-					print 'Limit reached, images are in ./downloads/'+title+'/'
-					exit(1)
+			if limit and download_count == limit:
+				print 'Limit reached, images are in ./downloads/'+title+'/'
+				exit(1)
 		if post['photos']:  # if post has a photoset
 			for photo in post['photos']:  # download each image in the photoset as well
 				download(photo['photo-url-1280'])
 				download_count = download_count + 1
-				if limit:  # if limit is defined
-					if download_count == limit:  # if limit reached
+				if limit and download_count == limit:
 						print 'Limit reached, images are in ./downloads/'+title+'/'
 						exit(1)
 
